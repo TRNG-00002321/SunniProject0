@@ -1,0 +1,3 @@
+id,username,password,isManager
+0,admin,pass,true
+1,alice,wonderland,false

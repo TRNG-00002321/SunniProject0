@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import date
-import sqlite3
+
 class Database:
     def __init__(self):
         self.user_df = pd.read_csv("../users.csv")
@@ -30,8 +30,11 @@ class Database:
     def update(self, index, new_date, amount, category, description):
         new_date = new_date.split("-")
         year, month, day = [int(x) for x in new_date]
-        print(self.expenses_df.loc[(self.user_df['id'] == index)])
-        self.expenses_df.loc[(self.user_df['id'] == index)] = [index, date(year, month, day).__str__(), amount, category, description]
+        # print(self.expenses_df.loc[index])
+        # self.expenses_df.loc[(self.user_df['id'] == index)] = [index, date(year, month, day).__str__(), amount, category, description]
+        entry = pd.Series({"date": date(year, month, day).__str__(), "amount": amount, "category": category, "description": description})
+        self.expenses_df[index] = entry
+        # self.expenses_df[index] = [date(year, month, day).__str__(), amount, category, description]
         print("TEST: ", self.expenses_df.loc[index])
         self.view()
 

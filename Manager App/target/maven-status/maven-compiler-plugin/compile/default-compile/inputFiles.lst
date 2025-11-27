@@ -1,0 +1,16 @@
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\dao\Dao.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\exception\UserNotFoundException.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\JDBC\ApprovalJDBC.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\JDBC\ExpenseJDBC.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\JDBC\UserJDBC.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\Main.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\menu\Menu.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\model\Approval.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\model\Expense.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\model\User.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\service\ApprovalService.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\service\ExpenseService.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\service\LoginService.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\service\UserService.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\util\DbConnection.java
+D:\Documents\Revature\Training\Project 0\Manager App\src\main\java\com\revature\expensemanager\util\InitializeDB.java

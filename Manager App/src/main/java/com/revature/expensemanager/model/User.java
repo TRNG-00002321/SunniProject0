@@ -3,7 +3,7 @@ package com.revature.expensemanager.model;
 import java.util.Optional;
 
 public class User {
-    private int id;
+    private Integer id;
     private String username;
     private String password;
     private String role;
@@ -21,8 +21,8 @@ public class User {
         this.role = role;
     }
 
-    public Optional<Integer> getId() {
-        return Optional.ofNullable(id);
+    public Integer getId() {
+        return id;
     }
 
     public String getUsername() {
@@ -35,5 +35,10 @@ public class User {
 
     public String getRole() {
         return role;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "%d %s %s %s".formatted(id, username, password, role);
     }
 }

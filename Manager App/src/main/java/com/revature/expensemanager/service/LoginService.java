@@ -10,11 +10,13 @@ public class LoginService {
     // private static final Connection connection = DbConnection.dbConnection();
     private static final UserJDBC userJDBC = new UserJDBC();
 
-    public int validateLogin(String username, String password) throws UserNotFoundException {
+    public User validateLogin(String username, String password) throws UserNotFoundException {
         List<User> users = userJDBC.getAll();
         for (User user : users) {
-            if (user.getUsername() == username && user.getPassword() == password && user.getId().isPresent())
-                return user.getId().get();
+            if (user.getRole().equals("MANAGER")
+                    && user.getUsername().equals(username)
+                    && user.getPassword().equals(password))
+                return user;
         }
         throw new UserNotFoundException("Incorrect username or password");
     }

@@ -1,6 +1,5 @@
 package com.revature.expensemanager;
 
-import java.util.Calendar;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -32,8 +31,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // Menu menu = new Menu();
-        // menu.run();
+        // System.out.println(DbConnection.class.getClassLoader().getResource("expensedb.properties"));
+
+        Menu menu = new Menu();
+        menu.run();
     }
 
 }

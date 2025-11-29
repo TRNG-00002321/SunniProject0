@@ -3,7 +3,7 @@ package com.revature.expensemanager.util;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -15,8 +15,8 @@ public class DbConnection {
 
     public static Connection dbConnection() {
         Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream("expensedb.properties"));
+        try (InputStream inputStream = ClassLoader.getSystemResourceAsStream("expensedb.properties")) {
+            properties.load(inputStream);
             connection = DriverManager.getConnection(
                     properties.getProperty("url"),
                     properties.getProperty("username"),

@@ -6,6 +6,7 @@ import java.util.Scanner;
 import com.revature.expensemanager.service.UserService;
 import com.revature.expensemanager.service.ExpenseService;
 import com.revature.expensemanager.exception.UserNotFoundException;
+import com.revature.expensemanager.model.User;
 import com.revature.expensemanager.service.ApprovalService;
 import com.revature.expensemanager.service.LoginService;
 
@@ -15,27 +16,46 @@ public class Menu {
     private static final ExpenseService expenseService = new ExpenseService();
     private static final ApprovalService approvalService = new ApprovalService();
     private static final LoginService loginService = new LoginService();
-    Scanner input = new Scanner(System.in);;
+    Scanner scanner = new Scanner(System.in);;
 
     String[] menuOptions = {
             "1. View Pending Expenses",
             "2. Approve Pending Expense",
             "3. Deny Pending Expense",
-            "4. View Reports" };
+            "4. View Reports",
+            "0. Exit" };
 
-    private int userID = -1;
+    private User user = new User("", "", "");
+
+    private final static void clearConsole() {
+        try {
+            final String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else { // Assume Unix-like systems (Linux, macOS)
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch (final Exception e) {
+            // Handle any exceptions, e.g., print an error message
+            System.err.println("Error clearing console: " + e.getMessage());
+        }
+    }
 
     private void login() {
-        while (userID < 0)
+        clearConsole();
+        while (user.getId() == null) {
             System.out.print("Enter username: ");
-        String username = input.nextLine();
-        System.out.print("Enter password: ");
-        String password = input.nextLine();
-        try {
-            userID = loginService.validateLogin(username, password);
-        } catch (UserNotFoundException e) {
-            System.out.println(e.getMessage() + " Try Again");
+            String username = scanner.nextLine();
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine();
+            try {
+                user = loginService.validateLogin(username, password);
+            } catch (UserNotFoundException e) {
+                System.out.println(e.getMessage() + " Try Again");
+            }
         }
+        clearConsole();
+        System.out.println("Welcome " + user.getUsername());
     }
 
     private void displayOptions() {
@@ -50,27 +70,27 @@ public class Menu {
         while (!valid) {
             System.out.print("> ");
             try {
-                choice = input.nextInt();
+                choice = scanner.nextInt();
                 valid = true;
             } catch (InputMismatchException ime) {
                 System.out.println("Please enter an integer value from the options above.");
             } finally {
-                input.nextLine();
+                scanner.nextLine();
             }
         }
         return choice;
     }
 
-    private String getDescription() {
+    private String getComment() {
         String description = "";
         boolean valid = false;
 
         while (!valid) {
             description = getStringInput();
             valid = true;
-            if (!description.isEmpty()) {
+            if (description.isEmpty()) {
                 valid = false;
-                System.out.println("Description Cannot Be Empty");
+                System.out.println("Comment Cannot Be Empty");
             }
         }
         return description;
@@ -79,8 +99,23 @@ public class Menu {
     private String getStringInput() {
         String choice = "";
         System.out.print("> ");
-        choice = input.nextLine();
+        choice = scanner.nextLine();
         return choice;
+    }
+
+    private boolean getConfirmation() {
+        System.out.println("Enter (Y) to confirm. Enter (N) to cancel:");
+
+        while (true) {
+            String confirmation = scanner.nextLine().trim();
+            if (confirmation.equalsIgnoreCase("Y")) {
+                return true;
+            } else if (confirmation.equalsIgnoreCase("N")) {
+                return false;
+            } else {
+                System.out.println("Invalid scanner. Please enter Y or N:");
+            }
+        }
     }
 
     private int chooseOption() {
@@ -97,6 +132,7 @@ public class Menu {
                 System.out.println("Invalid Selection. Enter a value from 0 to " + (menuOptions.length - 1));
             }
         }
+        clearConsole();
         return choice;
     }
 
@@ -108,10 +144,11 @@ public class Menu {
         while (!done) {
             displayOptions();
             choice = chooseOption();
-
             switch (choice) {
+                case 0:
+                    return;
                 case 1:
-                    System.out.println(expenseService.getExpenseTable(new String[] { "PENDING" }));
+                    System.out.println(expenseService.getExpenseTable());
                     break;
                 case 2:
                     approveExpense();
@@ -121,6 +158,7 @@ public class Menu {
                     break;
                 case 4:
                     viewReports();
+                    break;
                 default:
                     break;
             }
@@ -133,16 +171,36 @@ public class Menu {
     }
 
     private void denyExpense() {
-        System.out.println(expenseService.getPendingExpenseTable());
+        System.out.println(expenseService.getExpenseTable());
+        System.out.println("Deny Expense Report");
+        System.out.println("Enter Expense ID:");
         int expenseID = getIntegerInput();
-        String description = getDescription();
-        expenseService.approveExpense(expenseID, description);
+        System.out.println("Enter Comment");
+        String comment = getComment();
+        boolean confirmed = getConfirmation();
+        clearConsole();
+
+        if (confirmed) {
+            approvalService.denyExpense(expenseID, user.getId(), comment);
+            return;
+        }
+        System.out.println("Canceled.");
     }
 
     private void approveExpense() {
-        System.out.println(expenseService.getPendingExpenseTable());
+        System.out.println(expenseService.getExpenseTable());
+        System.out.println("Approve Expense Report");
+        System.out.println("Enter Expense ID");
         int expenseID = getIntegerInput();
-        String description = getDescription();
-        expenseService.approveExpense(expenseID, description);
+        System.out.println("Enter Comment");
+        String comment = getComment();
+        boolean confirmed = getConfirmation();
+        clearConsole();
+
+        if (confirmed) {
+            approvalService.approveExpense(expenseID, user.getId(), comment);
+            return;
+        }
+        System.out.println("Canceled.");
     }
 }

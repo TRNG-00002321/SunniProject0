@@ -20,6 +20,18 @@ CREATE TABLE IF NOT EXISTS expenses (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+<<<<<<< HEAD
+=======
+CREATE TRIGGER new_expense_approval
+AFTER INSERT ON expenses FOR EACH ROW
+INSERT INTO approvals
+SET
+    expense_id = id,
+    status = "PENDING";
+
+DROP TABLE approvals;
+
+>>>>>>> manager-app
 CREATE TABLE IF NOT EXISTS approvals (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     expense_id INTEGER NOT NULL,
@@ -36,6 +48,7 @@ CREATE TABLE IF NOT EXISTS approvals (
     FOREIGN KEY (expense_id) REFERENCES expenses (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+<<<<<<< HEAD
 CREATE TRIGGER new_expense_approval
 AFTER INSERT ON expenses
 FOR EACH ROW
@@ -44,6 +57,8 @@ BEGIN
     VALUES (NEW.id, 'PENDING');
 END;
 
+=======
+>>>>>>> manager-app
 INSERT INTO
     users (username, password, role)
 VALUES (
@@ -56,6 +71,7 @@ VALUES (
         "wonderland",
         "EMPLOYEE"
     );
+<<<<<<< HEAD
 
 DELETE FROM expenses;
 
@@ -74,3 +90,5 @@ VALUES (
     );
 
 SELECT * FROM users;
+=======
+>>>>>>> manager-app

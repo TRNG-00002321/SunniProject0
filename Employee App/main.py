@@ -50,7 +50,25 @@ class EmployeeMenu:
                 ("View Pending Expense Reports", self.view_pending),
                 ("Edit Pending Expense Reports", self.edit_expense),
                 ("View All Expense Reports", self.view_all),
+                ("Delete Pending Expense Reports", self.delete_expense),
                 ("Exit", self.close)]
+        
+    def get_category(self):
+        categories = self.db.get_expense_categories()
+        print("Select Expense Category:")
+        for i, category in enumerate(categories):
+            print(f"{i} - {category[1]}")
+        while True:
+            try:
+                choice = int(input("Enter choice: "))
+                if choice < 0 or choice >= len(categories):
+                    raise IndexError
+            except ValueError:
+                print("Invalid choice. Try again.")
+            except IndexError:
+                print("Invalid choice. Try again.")
+            else:
+                return categories[choice][0]
 
     def add_expense(self):
         print("Submitting New Expense Report: ")
@@ -62,6 +80,7 @@ class EmployeeMenu:
                 validate_amount(amount, 500)
                 description = input("Enter description: ")
                 validate_description(description)
+                category_id = self.get_category()
             except ValueError as ve:
                 clear_console()
                 print("Submitting New Expense Report: ")
@@ -71,7 +90,7 @@ class EmployeeMenu:
                 print("Submitting New Expense Report: ")
                 print("Invalid date format. Use YYYY-MM-DD.")
             else:
-                result = self.db.add_expense(self.user[0], float(amount), description, date)
+                result = self.db.add_expense(self.user[0], float(amount), description, date, category_id)
                 break
         if result:
             return "Expense Successfully Added"
@@ -99,6 +118,20 @@ class EmployeeMenu:
             return "Expense Sucessfully Updated"
         return "Could Not Update Expense. Please Try Again"
 
+    def delete_expense(self):
+        print(self.view_pending())
+        print()
+        while True:
+            try:
+                expense_id = int(input("Enter ID of expense report to delete: "))
+            except ValueError:
+                print("Invalid input. Try again.")
+            else:
+                result = self.db.delete_expense(self.user[0], expense_id)
+                break
+        if result:
+            return "Expense Successfully Deleted"
+        return "Could Not Delete Expense. Please Try Again"
             
     def view_pending(self):
         expenses = self.db.get_pending_expenses(self.user[0])

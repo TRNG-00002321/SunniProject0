@@ -24,9 +24,14 @@ class Database:
         self.cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
         return self.cursor.fetchone()
     
-    def add_expense(self, user_id, amount, description, date):
+    def get_expense_categories(self):
+        self.cursor.execute("SELECT * FROM categories")
+        return self.cursor.fetchall()
+    
+    def add_expense(self, user_id, amount, description, date, category_id):
         self.cursor.execute("INSERT INTO expenses (user_id, amount, description, date) VALUES(%s, %s, %s, %s)", (user_id, amount, description, date))
-        # expense_id = self.cursor.lastrowid        
+        expense_id = self.cursor.lastrowid
+        self.cursor.execute("INSERT INTO expense_categories (expense_id, category_id) VALUES(%s, %s)", (expense_id, category_id))     
         # self.cursor.execute("INSERT INTO approvals(expense_id, status) VALUES(%s, %s)", (expense_id, "PENDING"))
         self.connection.commit()
         return self.cursor.rowcount
@@ -41,7 +46,7 @@ class Database:
         return self.cursor.rowcount
 
     def delete_expense(self, user_id, expense_id):
-        self.cursor.execute('DELETE FROM expenses WHERE expense_id=%s AND user_id=%s', (expense_id, user_id))
+        self.cursor.execute('DELETE FROM expenses WHERE id=%s AND user_id=%s', (expense_id, user_id))
         return self.cursor.rowcount
     
     def get_pending_expenses(self, user_id):

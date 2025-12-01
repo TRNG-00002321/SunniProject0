@@ -1,7 +1,5 @@
 package com.revature.expensemanager.model;
 
-import java.util.List;
-
 public class Expense {
     private int id;
     private int userID;

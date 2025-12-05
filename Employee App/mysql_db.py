@@ -17,7 +17,7 @@ class Database:
         self.cursor = self.connection.cursor()
 
     def validate_user(self, username, password):
-        self.cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+        self.cursor.execute("SELECT * FROM users WHERE role=\"EMPLOYEE\" AND username = %s AND password = %s", (username, password))
         return self.cursor.fetchone()
     
     def get_expense_categories(self):

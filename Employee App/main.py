@@ -12,11 +12,21 @@ def clear_console():
         os.system('cls')
     else:  # For Linux and macOS
         os.system('clear')
+    print("Employee Expense Portal")
+
+def validate_id(id):
+    try:
+        id = int(id)
+    except ValueError:
+        raise ValueError("Invalid ID")
+    if id < 0:
+        raise ValueError("Invalid ID")
+    return id
 
 def validate_date(date):
-    message = "Invalid Date Format"
+    date = date.split('-')
     if len(date) < 3:
-        raise ValueError(message)
+        raise ValueError("Invalid Date Format")
     try:
         date = [int(d) for d in date]
         date = datetime.date(date[0], date[1], date[2])
@@ -47,25 +57,26 @@ class EmployeeMenu:
         # self.db = db.Database()
         try:
             self.db = mdb.Database()
-        except mysql.connector.errors.InterfaceError as cre:
+        except mysql.connector.errors.InterfaceError:
             print("Could not connect to database.")
             sys.exit()
         self.menu_options = [
+                ("Exit", self.close),
+                ("View Pending Expense Reports", self.view_pending),
+                ("View All Expense Reports", self.view_all),
                 ("Submit New Expense Report" , self.add_expense),
                 ("Edit Pending Expense Reports", self.edit_expense),
-                ("View Pending Expense Reports", self.view_pending),
                 ("Delete Pending Expense Reports", self.delete_expense),
-                ("View All Expense Reports", self.view_all),
-                ("Exit", self.close)]
+        ]
         
     def get_category(self):
         categories = self.db.get_expense_categories()
         print("Select Expense Category:")
-        for i, category in enumerate(categories):
+        for i, category in enumerate(categories, start=1):
             print(f"{i} - {category[1]}")
         while True:
             try:
-                choice = int(input("Enter choice: "))
+                choice = int(input("Enter choice: ")) - 1
                 if choice < 0 or choice >= len(categories):
                     raise IndexError
             except ValueError:
@@ -79,8 +90,8 @@ class EmployeeMenu:
         print("Submitting New Expense Report: ")
         while True:
             try:
-                date_input = input("Enter date (YYYY-MM-DD): ").split('-')
-                date = validate_date(date_input)
+                date = input("Enter date (YYYY-MM-DD): ")
+                date = validate_date(date)
                 amount = input("Enter amount ($25.04): $")
                 validate_amount(amount, 500000000)
                 description = input("Enter description: ")
@@ -106,34 +117,53 @@ class EmployeeMenu:
         print()
         while True:
             try:
-                expense_id = int(input("Enter ID of expense report: "))
+                expense_id = input("Enter ID of expense report: ")
+                expense_id = validate_id(expense_id)
                 expense = self.db.get_pending_expense_by_id(self.user[0], expense_id)
-                date_input = input("Enter date. (YYYY-MM-DD): ").split('-')
-                date = validate_date(date_input)
-                amount = input("Enter amount ($25.04): $")
-                validate_amount(amount, 500)
-                description = input("Enter description: ")
-                validate_description(description)
-            except ValueError:
-                print("Invalid input. Try again.")
+                if(expense is None):
+                    raise ValueError("Invalid ID")
+
+                amount = input("Enter amount ($25.04) or (Enter) to skip): $")
+                if amount == '':
+                    amount = expense[1]
+                else:
+                    validate_amount(amount, 1000000000)
+                
+                description = input("Enter description or (Enter) to skip): ")
+                if description == '':
+                    description = expense[2]
+                else:
+                    validate_description(description)
+
+                date = input("Enter date (YYYY-MM-DD) or (Enter) to skip): ")
+                if date == '':
+                    date = expense[3]
+                date = validate_date(date)
+            except ValueError as e:
+                clear_console()
+                print(self.view_pending())
+                print(e)
+
             else:
                 result = self.db.edit_expense(expense_id, self.user[0], amount, description, date)
                 break
         if result:
             return "Expense Sucessfully Updated"
-        return "Could Not Update Expense. Please Try Again"
+        return "Expense NOT Updated"
 
     def delete_expense(self):
         print(self.view_pending())
         print()
         while True:
             try:
-                expense_id = int(input("Enter ID of expense report to delete: "))
+                expense_id = input("Enter ID of expense report to delete: ")
+                expense_id = validate_id(expense_id)
             except ValueError:
                 print("Invalid input. Try again.")
             else:
                 result = self.db.delete_expense(self.user[0], expense_id)
                 break
+        print(result)
         if result:
             return "Expense Successfully Deleted"
         return "Could Not Delete Expense. Please Try Again"
@@ -151,6 +181,7 @@ class EmployeeMenu:
         return expenses
             
     def login(self):
+        clear_console()
         while True:
             username = input("Enter username: ")
             password = input("Enter password: ")
@@ -159,23 +190,23 @@ class EmployeeMenu:
                 clear_console()
                 print(f"Welcome, {username}!")
                 return
+            clear_console()
             print("Invalid username or password. Try again.")
 
     def run(self):
-        clear_console()
         self.login()
-        clear_console()
         while True:
             self.display_menu()
     
     def display_menu(self):
         choice = -1
         chosen = False
-        print()
         while not chosen:
             chosen = True
-            for i, option in enumerate(self.menu_options):
+            print()
+            for i, option in enumerate(self.menu_options[1:], start=1):
                 print(f"{i} - {option[0]}")
+            print(f"0 - {self.menu_options[0][0]}")
             try:
                 choice = int(input("Select an option: "))
             except ValueError:
@@ -193,7 +224,6 @@ class EmployeeMenu:
         clear_console()
         result = self.menu_options[choice][1]()
         clear_console()
-
         print(result)
         
         
